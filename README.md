@@ -1,7 +1,7 @@
 # LLM R&D Workspace 🧪
 
 This repository is my personal sandbox for **Large Language Model (LLM) experiments**.  
-Main focus is on **inference methods** and **optimizations** when running LLMs in limited hardware setups (e.g., RTX 3060 Laptop, Google Colab T4, MacBook Air M1).
+Main focus is on **inference methods** and **optimizations** when running LLMs in limited hardware setups (e.g., Google Colab T4, MacBook Air M1).
 
 ## 🔥 Goals
 - Test different **quantization formats** (AWQ, GPTQ, etc.)

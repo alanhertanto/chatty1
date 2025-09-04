@@ -1,0 +1,63 @@
+!pip install transformers
+!pip install -q --upgrade autoawq
+!pip install intel_extension_for_pytorch
+#!pip install git+https://github.com/huggingface/transformers.git
+#!pip install git+https://github.com/casper-hansen/AutoAWQ.git@1c5ccc791fa2cb0697db3b4070df1813f1736208
+
+from awq import AutoAWQForCausalLM
+from transformers import AutoTokenizer
+from datetime import datetime, UTC
+
+t0 = datetime.now(UTC)
+
+model_name_or_path = "TheBloke/Mistral-7B-v0.1-AWQ"
+
+# Load model
+# model = AutoAWQForCausalLM.from_quantized(model_name_or_path, fuse_layers=True,
+#                                           trust_remote_code=False, safetensors=True)
+model = AutoAWQForCausalLM.from_quantized(
+    model_name_or_path,
+    fuse_layers=True,
+    trust_remote_code=False,
+    safetensors=True,
+    device_map="auto",          # biar otomatis taruh ke GPU/CPU
+    dtype="auto"          # biar dtype sesuai model
+)
+# tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, trust_remote_code=False)
+tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, trust_remote_code=False)
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token
+
+prompt = "What is the 2nd amendment rights in United States about? Summarize it to 2 sentences."
+prompt_template=f'''{prompt}
+
+'''
+print("\n\n*** Generate:")
+load_done = datetime.now(UTC)
+
+elapsed_load = (load_done - t0).total_seconds()
+
+tokens = tokenizer(
+    prompt_template,
+    return_tensors='pt'
+).input_ids.cuda()
+
+# Generate output
+generation_output = model.generate(
+    tokens,
+    do_sample=True,
+    temperature=0.3,
+    top_p=0.95,
+    top_k=40,
+    max_new_tokens=60,
+    repetition_penalty=1.5
+)
+print("Output: ", tokenizer.decode(generation_output[0]))
+
+gen_done = datetime.now(UTC)
+
+elapsed_gen = (gen_done - load_done).total_seconds()
+
+print(f"Model loaded in {elapsed_load:.2f} seconds")
+print(f"Model finished generating in {elapsed_gen:.2f} seconds")
+

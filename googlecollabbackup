@@ -1,8 +1,6 @@
 !pip install transformers
 !pip install -q --upgrade autoawq
 !pip install intel_extension_for_pytorch
-#!pip install git+https://github.com/huggingface/transformers.git
-#!pip install git+https://github.com/casper-hansen/AutoAWQ.git@1c5ccc791fa2cb0697db3b4070df1813f1736208
 
 from awq import AutoAWQForCausalLM
 from transformers import AutoTokenizer

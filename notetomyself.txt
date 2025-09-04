@@ -1,0 +1,29 @@
+INPUT: user_prompt
+
+# 1. Bangun dictionary bobot (weight) dari SPOK
+weights = build_query_weights(user_prompt)
+# contoh: {"who": 0.1, "invented": 0.6, "smartphone": 0.5}
+
+# 2. Generate output dari model
+raw_output = model.generate(user_prompt)
+
+# 3. Cleanup output
+clean_output = remove_prompt_and_junk(raw_output, user_prompt)
+
+# 4. Split jadi kalimat-kalimat
+sentences = split_into_sentences(clean_output)
+
+# 5. Skor tiap kalimat pakai weights
+scored_sentences = []
+FOR sent in sentences:
+    score = 0
+    FOR word in sent.words:
+        IF word in weights:
+            score += weights[word]
+    scored_sentences.append((sent, score))
+
+# 6. Pilih kalimat dengan score tertinggi
+best_sentence = max(scored_sentences, by=score)
+
+# 7. Print hasil
+PRINT best_sentence
